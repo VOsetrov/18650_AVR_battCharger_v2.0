@@ -1,10 +1,11 @@
-#ifndef STARTIO_C
-#define STARTIO_C
+#ifndef LIC_MENUIO_C
+#define LIC_MENUIO_C
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <stddef.h>
-#include "startio.h"
+#include "lic_menuio.h"
+#include "lic328p_gpio.h"
 
 
 void exitHandler() {

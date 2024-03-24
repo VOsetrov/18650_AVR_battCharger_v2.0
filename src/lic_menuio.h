@@ -1,15 +1,6 @@
-#ifndef STARTIO_H
-#define STARTIO_H
+#ifndef LIC_MENUIO_H
+#define LIC_MENUIO_H
 
-typedef enum LedList {
-  GREEN,                              // The battery is full of charge
-  RED,                                // The battry is low of charge
-} Led;
-
-enum state {
-  OFF,
-  ON,
-};
 
 typedef enum {
   EXIT,
