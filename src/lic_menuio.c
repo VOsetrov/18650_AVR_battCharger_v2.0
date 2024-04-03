@@ -5,20 +5,35 @@
 #include <avr/interrupt.h>
 #include <stddef.h>
 #include "lic_menuio.h"
+#include "lic_adc.h"
 #include "lic328p_gpio.h"
-
 
 void exitHandler() {
   PORTB &= ~(1<<GREEN);
+  ADCSRA &= ~(1<<ADEN);                         // Turn the ADC on  
 }
+
 void chargHandler() {
   PORTB |= (1<<GREEN);
+  adc_setMux(channel.config[ADC0].mux);         // Turn the 1st ADC channel
+  ADCSRA |= (1<<ADEN);                          // Turn the ADC on  
 }
+
 void capHandler() {
 }
 
 void inResHandler() {
 }
+
+Menu menu = {
+  .currentMode = &menu.modes[EXIT], 
+  .modes = {
+    { 0x30, exitHandler },
+    { 0x31, chargHandler},
+    { 0x32, capHandler  },
+    { 0x33, inResHandler},
+  }
+};
 
 void setMode 
   (Menu* menu, uint8_t udr) {

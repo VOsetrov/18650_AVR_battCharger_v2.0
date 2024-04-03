@@ -1,7 +1,6 @@
 #ifndef LIC_MENUIO_H
 #define LIC_MENUIO_H
 
-
 typedef enum {
   EXIT,
   CHARGING,
@@ -18,6 +17,8 @@ typedef struct Menu {
   MenuMode* currentMode;
   MenuMode modes[];
 } Menu;
+
+Menu menu;
 
 void setMode(Menu* menu, uint8_t udr);
 void exitHandler();
