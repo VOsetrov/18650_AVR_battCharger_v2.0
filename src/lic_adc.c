@@ -3,15 +3,6 @@
 #include "lic_adc.h"
 #include "lic328p_gpio.h"
 
-adcChannel channel = {
-  .currentChan = &channel
-    .config[ADC0],
-  .config = {
-    { ADC0, 0x00 },
-    { ADC1, 0x01 },
-  }
-};
-
 void adc_init() {
   ADCSRA |= (1<<ADPS2);               // Set the prescaler of freqency to 128 
   ADCSRA |= (1<<ADPS1);               // it will be 125 kHz for ATmega328P
@@ -24,40 +15,39 @@ void adc_init() {
   ADCSRB |= (1<<ADTS1);               // ...
   ADCSRB |= (1<<ADTS2);               // ...
 
-  adc_setMux(channel.config[ADC0]
-    .mux);
+  adc_setMux(ADC0);                   // First channel initialization
 
   ADCSRA |= (1<<ADEN);                // Turn the ADC on  
 }
 
 uint16_t adc() {
   uint8_t adcLow = ADCL;
-  return ADCH << 8 | adcLow; 
+  return ADCH << 8 | adcLow;          // Returns the current conversion value
 }
 
 void adc_setMux 
-  (uint8_t muxset) {
+  (uint8_t muxset) {                  // Current ADC channel setup
 
   uint8_t reg = ADMUX;
-  reg &= 0xF0;                        // Set the MUX bits to the 0
-  reg |= muxset;                      // Set MUX bits to input channel 
-  ADMUX = reg;
+  reg &= 0xF0;                        // Seting MUX bits to the 0
+  reg |= muxset;                      // MUX bits setup to the current value
+  ADMUX = reg;                        // Register configuration assignment
 }
 
 uint8_t adc_switchChannel
   (adcChannel* config) {
 
-  uint8_t size = (sizeof(config)) /
-    (sizeof(config[ADC0]));
+  uint8_t size = 
+   MAX_ADC_CHANNELS - 1;              // Getting number of channels in array
 
-  if(config->currentChan->name == 
-      (size-1)) {
+  if(config->currentChan->name >= 
+      (size)) {                       // If the current channel is last
     config->currentChan = 
-      &config->config[ADC0];
+      &config->config[ADC0];          // switch to the first channel in array
   } else {
-    config->currentChan++;
+    config->currentChan++;            // If not, switch to the next channel
   };
 
-  return config->currentChan->mux;
-
+  return config->currentChan->mux;    // Return MUX bit configuration for the 
+                                      // currently selected channel
 }

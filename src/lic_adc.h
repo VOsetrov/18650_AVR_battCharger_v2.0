@@ -10,12 +10,12 @@ typedef struct {
   uint8_t mux;
 } adcConfig;
 
-typedef struct {
-  adcConfig* currentChan;
-  adcConfig config[];
-} adcChannel; 
+#define MAX_ADC_CHANNELS 2
 
-adcChannel channel;
+typedef struct {
+  volatile adcConfig* currentChan;
+  adcConfig config[MAX_ADC_CHANNELS];
+} adcChannel; 
 
 void adc_init();
 uint16_t adc();                       // Returns the ADC data register value

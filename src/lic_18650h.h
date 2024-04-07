@@ -8,14 +8,16 @@ typedef enum {
 
 typedef struct {
   lion batnum;
-  uint8_t voltage;
+  uint16_t voltage;
   uint8_t capacitance;
   uint8_t resistance;
 } battery;
 
+#define MAX_BATTERIES 2
+
 typedef struct {
-  battery* currbat;
-  battery list[];
+  volatile battery* currbat;
+  battery list[MAX_BATTERIES];
 } batlist;
 
 void voltageHandling(lion battnum);

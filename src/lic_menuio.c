@@ -10,13 +10,12 @@
 
 void exitHandler() {
   PORTB &= ~(1<<GREEN);
-  ADCSRA &= ~(1<<ADEN);                         // Turn the ADC on  
+  ADCSRA &= ~(1<<ADEN);                         // Turn the ADC off  
 }
 
 void chargHandler() {
   PORTB |= (1<<GREEN);
-  adc_setMux(channel.config[ADC0].mux);         // Turn the 1st ADC channel
-  ADCSRA |= (1<<ADEN);                          // Turn the ADC on  
+    ADCSRA |= (1<<ADEN);                          // Turn the ADC on  
 }
 
 void capHandler() {
