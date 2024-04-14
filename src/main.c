@@ -1,6 +1,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <util/delay.h>
+#include <stdbool.h>
 #include "lic328p_gpio.h"
 #include "lic_menuio.h"
 #include "lic_uart.h"
@@ -24,16 +25,45 @@ static batlist batstat = {
   }
 };
 
-static void voltage_saveData
-  (uint16_t adcData, batlist* batstat,
-    adcchan channel);
+static battTxStatus transmitStatus = {
+  .sendstatus = false,
+  .currentstatus = &transmitStatus
+    .fieldsstatus[battname],
+  .fieldsstatus = {
+    { battname, false },
+    { voltage, false },
+    { capacitance, false },
+    { resistance, false },
+  }
+};
+
+void battTransmitChecking
+  (battTxStatus* array);
+
+void battTransmitChecking
+  (battTxStatus* array) {
+
+  parameters battnamevalue = array->
+     currentstatus->field;
+
+  switch(battnamevalue) {
+   case battname:
+     break;
+   case voltage:
+     break;
+   case resistance:
+     break;
+   case capacitance:
+     break;
+  };
+}
 
 ISR(ADC_vect) {
 
   while(!(ADCSRA & (1<<ADIF))) {        // Waiting for conversion
   };
 
-  voltage_saveData(adc(), &batstat,
+  voltageHandling(adc(), &batstat,
       channel.currentChan->name);
   adc_setMux(adc_switchChannel
       (&channel));                      // Set the next ADC Channel for meas.
@@ -48,40 +78,39 @@ ISR(USART_RX_vect) {
   UCSR0A |= (1<<RXC0);                  // we are ready to receive new data
 }
 
-void voltage_saveData(uint16_t adcData,
-    batlist* batstat, adcchan channel) {
+ISR(USART_TX_vect) {
 
-  switch(channel) {
-    case ADC0:
-      batstat->list[BATT1].voltage = 
-        adcData;
-      batstat->currbat = 
-        &batstat->list[BATT1];
-      break;
-    case ADC1:
-      batstat->list[BATT2].voltage =
-        adcData;
-      batstat->currbat =
-        &batstat->list[BATT2];
-      break;
-    default:
-      break;
-  }
 }
 
 int main(void) {
-  
+
   port_init();
   uart_init(MYUBRR); 
   timer_init();
   adc_init();
 
-
   sei();
 
   while(1) {
 
-  }
+    if(UCSR0B & (1<<TXCIE0)) {
+      if(checkTransmit(&transmitStatus)) {
+        updateTransmitStatus(&transmitStatus);
+        lion battname 
+          = batstat.currbat->batnum;
+        switch(battname) {
+          case BATT1:
+            batstat.currbat =
+              &batstat.list[BATT2];
+            break;
+          case BATT2:
+            batstat.currbat =
+              &batstat.list[BATT1];
+            break;
+        };
+      };
+    };
 
   return 0;
+  }
 }

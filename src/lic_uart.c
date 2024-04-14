@@ -5,7 +5,7 @@
 void uart_init() {
   UBRR0H = (uint8_t)(MYUBRR>>8);      // Set the BAUD rate in UART baud Rate
   UBRR0L = (uint8_t)MYUBRR;           // registers (to low & high)
-  UCSR0B = 0b11011000;                // Set the RX&TX&Interrupt Rx enable
+  UCSR0B = 0b10011000;                // Set the RX Interrupt & Tx&Rx enable
   UCSR0C &= ~(1<<UMSEL01);            // Set the Asynchronus UART mode
   UCSR0C &= ~(1<<UMSEL00);            // ...
   UCSR0C &= ~(1<<USBS0);              // Set the 1 stop bit

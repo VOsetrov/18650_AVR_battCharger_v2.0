@@ -11,11 +11,14 @@
 void exitHandler() {
   PORTB &= ~(1<<GREEN);
   ADCSRA &= ~(1<<ADEN);                         // Turn the ADC off  
+  UCSR0B &= ~(1<<TXCIE0);                       // TX Complete Interrupt 
+                                                // disable 
 }
 
 void chargHandler() {
   PORTB |= (1<<GREEN);
-    ADCSRA |= (1<<ADEN);                          // Turn the ADC on  
+  ADCSRA |= (1<<ADEN);                          // Turn the ADC on  
+  UCSR0B |= (1<<TXCIE0);                        // TX Complete Interrupt enable 
 }
 
 void capHandler() {
