@@ -3,34 +3,7 @@
 
 #include <stdbool.h>
 #include "lic_adc.h"
-
-typedef enum {
-  BATT1,
-  BATT2,
-} lion;
-
-typedef enum {
-  battname,
-  voltage,
-  capacitance,
-  resistance,
-} parameters;
-
-#define MAX_PARAMS 4
-
-typedef struct {
-  lion batnum;
-  uint16_t voltage;
-  uint8_t capacitance;
-  uint8_t resistance;
-} battery;
-
-#define MAX_BATTERIES 2
-
-typedef struct {
-  volatile battery* currbat;
-  battery list[MAX_BATTERIES];
-} batlist;
+#include "battery.h"
 
 typedef struct {
   parameters field;
@@ -38,16 +11,19 @@ typedef struct {
 } fieldTxStatus;
 
 typedef struct {
-  bool sendstatus;
   fieldTxStatus* currentstatus;
   fieldTxStatus fieldsstatus[MAX_PARAMS];
 } battTxStatus;
 
 void voltageHandling(uint16_t adcData, 
     batlist* batstat, adcchan channel);
-void updateTransmitStatus
-    (battTxStatus* structure);
-void updateBatteryStatus(batlist* structure);
-bool checkTransmit(battTxStatus* structure);    // Check transfer status, if it
-                                                // complete return true.
+void resetTransmitStatus
+    (battTxStatus* structure);                  // Init the transmit status of 
+                                                // all fields to false.
+battID updateBatteryTransmitStatus
+    (batlist* structure);                       // Returns the name of the next
+                                                // battery for data transmition.
+bool checkTransmit(battTxStatus* structure);    // Check transfer status, if
+                                                // completed return true.
+
 #endif

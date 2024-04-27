@@ -18,30 +18,33 @@ void voltageHandling(uint16_t adcData,
   }
 }
 
-void updateTransmitStatus
+void resetTransmitStatus
     (battTxStatus* structure) {
-  int i;
 
-  for(i = 1; i <= MAX_PARAMS; i++) {
+  for(uint8_t i = 1; i <= MAX_PARAMS; i++) {
     structure->fieldsstatus[i].status =
       false;
   };
 
-  structure->currentstatus++;
+  structure->currentstatus =
+    &structure->fieldsstatus[0];
+}
 
-  if(structure->currentstatus >= &structure->
-      fieldsstatus[MAX_PARAMS]) {
-    structure->currentstatus = 
-      &structure->fieldsstatus[0];
-  };
+battID updateBatteryTransmitStatus
+    (batlist* structure) {
+  battID name = structure->currbat->id;
+
+  if(name == BATT1) {
+    return BATT2;
+  } else return BATT1;
 }
 
 bool checkTransmit(battTxStatus* structure) {
-  int i;
-  for(i = MAX_PARAMS - 1; i >= 0; i--) {
+  for(uint8_t i = MAX_PARAMS - 1; i >= 0; i--) {
     if(!(structure->fieldsstatus[i].status)) {
       return false;
     };
   };
   return true;
 }
+

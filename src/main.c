@@ -4,9 +4,12 @@
 #include <stdbool.h>
 #include "lic328p_gpio.h"
 #include "lic_menuio.h"
+#include "battery.h"
+#include "lic_18650h.h"
 #include "lic_uart.h"
 #include "lic_adc.h"
-#include "lic_18650h.h"
+
+static transmit_data packet_tx = {0};
 
 static adcChannel channel = {
   .currentChan = &channel
@@ -26,11 +29,10 @@ static batlist batstat = {
 };
 
 static battTxStatus transmitStatus = {
-  .sendstatus = false,
   .currentstatus = &transmitStatus
-    .fieldsstatus[battname],
+    .fieldsstatus[deviceID],
   .fieldsstatus = {
-    { battname, false },
+    { deviceID, false },
     { voltage, false },
     { capacitance, false },
     { resistance, false },
@@ -47,7 +49,7 @@ void battTransmitChecking
      currentstatus->field;
 
   switch(battnamevalue) {
-   case battname:
+   case deviceID:
      break;
    case voltage:
      break;
@@ -60,11 +62,16 @@ void battTransmitChecking
 
 ISR(ADC_vect) {
 
+  battery mybattery = {0};
+
   while(!(ADCSRA & (1<<ADIF))) {        // Waiting for conversion
   };
-
-  voltageHandling(adc(), &batstat,
-      channel.currentChan->name);
+  mybattery.voltage = adc();            // Saving ADC data
+  mybattery.id = returnBattID
+    (channel.currentChan->name);        // Saving current Battery ID
+  packet_tx.ready = 
+    fillTransmitPackage(&mybattery,
+      &packet_tx);                      // Fill out the package and set status
   adc_setMux(adc_switchChannel
       (&channel));                      // Set the next ADC Channel for meas.
   ADCSRA |= (1<<ADIF);                  // Clearing the flag for the next 
@@ -75,12 +82,21 @@ ISR(ADC_vect) {
 ISR(USART_RX_vect) {
 
   setMode(&menu, UDR0);                 // Selecting the Menu Mode
-  UCSR0A |= (1<<RXC0);                  // we are ready to receive new data
+  UCSR0A |= (1<<RXC0);                  // We are ready to receive new data
+  
+  reti();
+}
+
+ISR(USART_UDRE_vect) {
+
+  reti();
 }
 
 ISR(USART_TX_vect) {
 
+  reti();
 }
+
 
 int main(void) {
 
@@ -95,20 +111,11 @@ int main(void) {
 
     if(UCSR0B & (1<<TXCIE0)) {
       if(checkTransmit(&transmitStatus)) {
-        updateTransmitStatus(&transmitStatus);
-        lion battname 
-          = batstat.currbat->batnum;
-        switch(battname) {
-          case BATT1:
-            batstat.currbat =
-              &batstat.list[BATT2];
-            break;
-          case BATT2:
-            batstat.currbat =
-              &batstat.list[BATT1];
-            break;
-        };
+        resetTransmitStatus(&transmitStatus);
+        batstat.currbat = &batstat.list[
+          updateBatteryTransmitStatus(&batstat)];
       };
+
     };
 
   return 0;
