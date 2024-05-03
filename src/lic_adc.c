@@ -34,11 +34,21 @@ void adc_setMux
   ADMUX = reg;                        // Register configuration assignment
 }
 
+adcchan next_adcChannel(uint8_t size,
+    adcchan cname) {
+  adcchan ch = cname++;
+
+  if(ch >= (size)) {
+    ch = ADC0;
+  };
+  return ch;
+}
+
 uint8_t adc_switchChannel
   (adcChannel* config) {
 
   uint8_t size = 
-   MAX_ADC_CHANNELS - 1;              // Getting number of channels in array
+    MAX_ADC_CHANNELS - 1;             // Getting number of channels in array
 
   if(config->currentChan->name >= 
       (size)) {                       // If the current channel is last

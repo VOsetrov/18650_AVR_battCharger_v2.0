@@ -29,7 +29,7 @@ typedef struct {
 #define PACKET_SIZE sizeof(battery)
 
 typedef struct {
-  volatile battery* currbat;
+  volatile battery* plist;
   battery list[MAX_BATTERIES];
 } batlist;
 

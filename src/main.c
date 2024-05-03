@@ -9,7 +9,7 @@
 #include "lic_uart.h"
 #include "lic_adc.h"
 
-static transmit_data packet_tx = {0};
+static transmit_data packet_tx;
 
 static adcChannel channel = {
   .currentChan = &channel
@@ -21,7 +21,7 @@ static adcChannel channel = {
 };
 
 static batlist batstat = {
-  .currbat = &batstat.list[BATT1],
+  .plist = &batstat.list[BATT1],
   .list = {
     { BATT1, 0, 0, 0 },
     { BATT2, 0, 0, 0 },
@@ -62,18 +62,28 @@ void battTransmitChecking
 
 ISR(ADC_vect) {
 
-  battery mybattery = {0};
-
   while(!(ADCSRA & (1<<ADIF))) {        // Waiting for conversion
   };
-  mybattery.voltage = adc();            // Saving ADC data
-  mybattery.id = returnBattID
-    (channel.currentChan->name);        // Saving current Battery ID
+  uint16_t data = adc();
+  battID id = returnBattID(channel.
+      currentChan->name);
+
+  if(batstat.plist->id != id) {
+    batstat.plist = &batstat.list[id];
+  };
+
+  batstat.plist->voltage = data;        // Saving ADC data
   packet_tx.ready = 
-    fillTransmitPackage(&mybattery,
-      &packet_tx);                      // Fill out the package and set status
-  adc_setMux(adc_switchChannel
-      (&channel));                      // Set the next ADC Channel for meas.
+    fillTransmitPackage(batstat.plist,
+    &packet_tx);                        // Fill out the package and set status
+
+  adcchan cname = next_adcChannel(
+    MAX_ADC_CHANNELS, channel.
+    currentChan->name);
+  channel.currentChan = &channel.
+    config[cname];
+  adc_setMux(cname);                    // Set the next ADC Channel for meas.
+
   ADCSRA |= (1<<ADIF);                  // Clearing the flag for the next 
                                         // interrupt.
   reti();                               // Returns from an interrupt routine
@@ -88,11 +98,22 @@ ISR(USART_RX_vect) {
 }
 
 ISR(USART_UDRE_vect) {
-
+  if(packet_tx.ready){
+    packet_tx.inprocess = true;
+    packet_tx.ready = false;
+  } else if(packet_tx.inprocess) { 
+    UDR0 = *packet_tx.pdata;
+  };
   reti();
 }
 
 ISR(USART_TX_vect) {
+  if(packet_tx.inprocess) {
+    packet_tx.pdata++;
+  };
+  if(packet_tx.pdata >= packet_tx.end) {
+    init_transmitData(&packet_tx); 
+  };
 
   reti();
 }
@@ -105,6 +126,8 @@ int main(void) {
   timer_init();
   adc_init();
 
+  init_transmitData(&packet_tx);
+
   sei();
 
   while(1) {
@@ -112,7 +135,7 @@ int main(void) {
     if(UCSR0B & (1<<TXCIE0)) {
       if(checkTransmit(&transmitStatus)) {
         resetTransmitStatus(&transmitStatus);
-        batstat.currbat = &batstat.list[
+        batstat.plist = &batstat.list[
           updateBatteryTransmitStatus(&batstat)];
       };
 

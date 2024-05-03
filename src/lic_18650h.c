@@ -32,7 +32,7 @@ void resetTransmitStatus
 
 battID updateBatteryTransmitStatus
     (batlist* structure) {
-  battID name = structure->currbat->id;
+  battID name = structure->plist->id;
 
   if(name == BATT1) {
     return BATT2;

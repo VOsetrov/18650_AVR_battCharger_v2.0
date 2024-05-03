@@ -1,4 +1,5 @@
 #include <avr/io.h>
+#include <string.h>
 #include "lic_uart.h"
 #include "lic328p_gpio.h"
 
@@ -19,6 +20,15 @@ void uart_init() {
   UCSR0B &= ~(1<<UCSZ02);             // Set the 8 bit package settings
   UCSR0C |= (1<<UCSZ01);              // ...
   UCSR0C |= (1<<UCSZ00);              // ...
+}
+
+void init_transmitData(transmit_data*
+    td) {
+  td->pdata = td->data;
+  td->end = td->data + PACKET_SIZE;
+  memset(td->data, 0, PACKET_SIZE);
+  td->inprocess = false;
+  td->ready = false;
 }
 
 void uart_transmit(uint8_t data) {
