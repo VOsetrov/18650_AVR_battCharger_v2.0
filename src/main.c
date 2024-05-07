@@ -28,17 +28,6 @@ static batlist batstat = {
   }
 };
 
-static battTxStatus transmitStatus = {
-  .currentstatus = &transmitStatus
-    .fieldsstatus[deviceID],
-  .fieldsstatus = {
-    { deviceID, false },
-    { voltage, false },
-    { capacitance, false },
-    { resistance, false },
-  }
-};
-
 void battTransmitChecking
   (battTxStatus* array);
 
@@ -131,16 +120,10 @@ int main(void) {
   sei();
 
   while(1) {
-
+/*
     if(UCSR0B & (1<<TXCIE0)) {
-      if(checkTransmit(&transmitStatus)) {
-        resetTransmitStatus(&transmitStatus);
-        batstat.plist = &batstat.list[
-          updateBatteryTransmitStatus(&batstat)];
-      };
-
     };
-
+*/
+  };
   return 0;
-  }
 }

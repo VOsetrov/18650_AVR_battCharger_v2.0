@@ -39,10 +39,10 @@ void uart_transmit(uint8_t data) {
 
 bool fillTransmitPackage(const volatile battery*
     currbat, transmit_data* packet_tx) {
-
+   uint8_t i;
   uint8_t* dataPtr = (uint8_t*)currbat;
 
-  for(uint8_t i = 0; i < sizeof(battery); i++) {
+  for(i = 0; i < sizeof(battery); i++) {
     packet_tx->data[i] = *dataPtr;
     dataPtr++;
   };

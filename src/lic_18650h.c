@@ -20,7 +20,6 @@ void voltageHandling(uint16_t adcData,
 
 void resetTransmitStatus
     (battTxStatus* structure) {
-
   for(uint8_t i = 1; i <= MAX_PARAMS; i++) {
     structure->fieldsstatus[i].status =
       false;
