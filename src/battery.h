@@ -33,6 +33,7 @@ typedef struct {
   battery list[MAX_BATTERIES];
 } batlist;
 
+void init_battData(batlist* batt);
 battID returnBattID(adcchan channel);
 
 #endif

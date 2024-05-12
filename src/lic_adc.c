@@ -20,6 +20,19 @@ void adc_init() {
   ADCSRA |= (1<<ADEN);                // Turn the ADC on  
 }
 
+void init_adcChan
+       (adcChannel* chn) {
+  chn->currentChan = &chn->config[0];
+  chn->config[0] = (adcConfig) {
+      .name = ADC0, 
+      .mux  = 0x00,
+  };
+  chn->config[1] = (adcConfig) {
+      .name = ADC1, 
+      .mux  = 0x01 
+  };
+}
+
 uint16_t adc() {
   uint8_t adcLow = ADCL;
   return ADCH << 8 | adcLow;          // Returns the current conversion value

@@ -18,6 +18,7 @@ typedef struct {
 } adcChannel; 
 
 void adc_init();
+void init_adcChan(adcChannel* chn);   // Init a struct adcChannel
 uint16_t adc();                       // Returns the ADC data register value
 void adc_setMux(uint8_t muxset);      // Init a selected ADC channel
 adcchan next_adcChannel(uint8_t size,

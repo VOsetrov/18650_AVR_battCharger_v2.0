@@ -3,6 +3,8 @@
 #include "lic_adc.h"
 
 void port_init() {
+  DDRC &= ~(1<<DDC0);                 // Set the ADC0 port to read
+  DDRC &= ~(1<<DDC1);                 // Set the ADC1 port to read
   DDRB |= (1<<GREEN);                 // Set the LED ports to write
   DDRB |= (1<<RED);                   // ...
   PORTB &= ~(1<<GREEN);               // Set the RedLED port to 0V (off)

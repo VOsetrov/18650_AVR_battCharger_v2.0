@@ -10,44 +10,8 @@
 #include "lic_adc.h"
 
 static transmit_data packet_tx;
-
-static adcChannel channel = {
-  .currentChan = &channel
-    .config[ADC0],
-  .config = {
-    { ADC0, 0x00 },
-    { ADC1, 0x01 },
-  }
-};
-
-static batlist batstat = {
-  .plist = &batstat.list[BATT1],
-  .list = {
-    { BATT1, 0, 0, 0 },
-    { BATT2, 0, 0, 0 },
-  }
-};
-
-void battTransmitChecking
-  (battTxStatus* array);
-
-void battTransmitChecking
-  (battTxStatus* array) {
-
-  parameters battnamevalue = array->
-     currentstatus->field;
-
-  switch(battnamevalue) {
-   case deviceID:
-     break;
-   case voltage:
-     break;
-   case resistance:
-     break;
-   case capacitance:
-     break;
-  };
-}
+static adcChannel channel;
+static batlist batstat;
 
 ISR(ADC_vect) {
 
@@ -75,15 +39,12 @@ ISR(ADC_vect) {
 
   ADCSRA |= (1<<ADIF);                  // Clearing the flag for the next 
                                         // interrupt.
-  reti();                               // Returns from an interrupt routine
 }
 
 ISR(USART_RX_vect) {
 
   setMode(&menu, UDR0);                 // Selecting the Menu Mode
   UCSR0A |= (1<<RXC0);                  // We are ready to receive new data
-  
-  reti();
 }
 
 ISR(USART_UDRE_vect) {
@@ -93,7 +54,6 @@ ISR(USART_UDRE_vect) {
   } else if(packet_tx.inprocess) { 
     UDR0 = *packet_tx.pdata;
   };
-  reti();
 }
 
 ISR(USART_TX_vect) {
@@ -103,8 +63,6 @@ ISR(USART_TX_vect) {
   if(packet_tx.pdata >= packet_tx.end) {
     init_transmitData(&packet_tx); 
   };
-
-  reti();
 }
 
 
@@ -115,15 +73,14 @@ int main(void) {
   timer_init();
   adc_init();
 
+  init_adcChan(&channel);
+  init_battData(&batstat);
   init_transmitData(&packet_tx);
 
   sei();
 
   while(1) {
-/*
-    if(UCSR0B & (1<<TXCIE0)) {
-    };
-*/
   };
+
   return 0;
 }

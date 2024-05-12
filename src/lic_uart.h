@@ -5,11 +5,11 @@
 #include "battery.h"
 
 typedef struct {
-  uint8_t* pdata;                               // Pointer to data[PACKET_SIZE]
-  uint8_t* end;                                 // The end of data[PACKET_SIZE]
   uint8_t data[PACKET_SIZE];                    // Sending package
   bool inprocess;                               // State of sending
   bool ready;                                   // Package is ready to send
+  uint8_t* pdata;                               // Pointer to data[PACKET_SIZE]
+  uint8_t* end;                                 // The end of data[PACKET_SIZE]
 } transmit_data;
 
 void uart_init();
