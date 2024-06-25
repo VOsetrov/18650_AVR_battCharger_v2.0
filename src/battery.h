@@ -18,7 +18,7 @@ typedef enum {
 
 #define MAX_PARAMS 4
 
-typedef struct {
+typedef volatile struct {
   battID id;
   uint16_t voltage;
   uint8_t capacitance;
@@ -28,12 +28,13 @@ typedef struct {
 #define MAX_BATTERIES 2
 #define PACKET_SIZE sizeof(battery)
 
-typedef struct {
-  volatile battery* plist;
+typedef volatile struct {
   battery list[MAX_BATTERIES];
+  battery* plist;
 } batlist;
 
 void init_battData(batlist* batt);
-battID returnBattID(adcchan channel);
+battID returnBattID
+	(enum adc_chan channel);
 
 #endif

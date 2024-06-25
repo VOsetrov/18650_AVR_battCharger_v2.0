@@ -3,26 +3,23 @@
 #include "lic_adc.h"
 #include "lic328p_gpio.h"
 
-void adc_init() {
-  ADCSRA |= (1<<ADPS2);               // Set the prescaler of freqency to 128 
-  ADCSRA |= (1<<ADPS1);               // it will be 125 kHz for ATmega328P
-  ADCSRA |= (1<<ADPS0);               // ...
-  ADCSRA |= (1<<ADATE);               // Auto trigger enable
-  ADMUX |= (1<<REFS1);                // Set the internal 1.1V voltage reference
-  ADMUX |= (1<<REFS0);                // ...
-  ADMUX &= ~(1<<ADLAR);               // Right adjusten of the data presentation
-  ADCSRB &= ~(1<<ADTS0);              // Timer/Counter1 overflow interrups
-  ADCSRB |= (1<<ADTS1);               // ...
-  ADCSRB |= (1<<ADTS2);               // ...
 
+void adc_init() {
+	adc_fPrsc(128);											// It will be 125 kHz for 16 MHz Crystal
+	adc_voltRef(V_INT);									// Set the internal 1.1 Voltage Reference
+
+  ADMUX &= ~(1<<ADLAR);               // Right adjusten of the data presentation
+
+	adc_triggerSrc(TC1_OVERFLOW);				// Set the T/C 1 to overflow interrupt
   adc_setMux(ADC0);                   // First channel initialization
 
-  ADCSRA |= (1<<ADEN);                // Turn the ADC on  
+  ADCSRA |= (1<<ADATE);               // Auto trigger enable
+  ADCSRA |= (1<<ADIE);                // ADC conversion complete interrupt 
+                                      // enable
 }
 
 void init_adcChan
        (adcChannel* chn) {
-  chn->currentChan = &chn->config[0];
   chn->config[0] = (adcConfig) {
       .name = ADC0, 
       .mux  = 0x00,
@@ -31,25 +28,15 @@ void init_adcChan
       .name = ADC1, 
       .mux  = 0x01 
   };
+  chn->currentChan = &chn->config[0];
 }
 
-uint16_t adc() {
-  uint8_t adcLow = ADCL;
-  return ADCH << 8 | adcLow;          // Returns the current conversion value
-}
 
-void adc_setMux 
-  (uint8_t muxset) {                  // Current ADC channel setup
+enum adc_chan next_adcChannel
+	(uint8_t size, 
+	 enum adc_chan cname) {
 
-  uint8_t reg = ADMUX;
-  reg &= 0xF0;                        // Seting MUX bits to the 0
-  reg |= muxset;                      // MUX bits setup to the current value
-  ADMUX = reg;                        // Register configuration assignment
-}
-
-adcchan next_adcChannel(uint8_t size,
-    adcchan cname) {
-  adcchan ch = cname++;
+  enum adc_chan ch = cname++;
 
   if(ch >= (size)) {
     ch = ADC0;

@@ -20,18 +20,6 @@ enum state {
   ON,
 };
 
-typedef enum {
-  ADC0,
-  ADC1,
-  ADC2,
-  ADC3,
-  ADC4,
-  ADC5,
-  ADC6,
-  ADC7,
-  ADC8,
-} adcchan;
-
 void port_init();
 void timer_init();
 void led_control(enum state state);

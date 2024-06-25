@@ -2,7 +2,8 @@
 #include "lic_18650h.h"
 
 void voltageHandling(uint16_t adcData,
-    batlist* batstat, adcchan channel) {
+    batlist* batstat, 
+		enum adc_chan channel) {
 
   switch(channel) {
     case ADC0:

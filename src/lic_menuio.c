@@ -9,20 +9,22 @@
 #include "lic328p_gpio.h"
 
 void exitHandler() {
-  PORTB &= ~(1<<GREEN);
-  ADCSRA &= ~(1<<ADEN);                         // Turn the ADC off  
-  UCSR0B &= ~(1<<TXCIE0);                       // TX Complete Interrupt
+//  PORTB &= ~(1<<GREEN);
+  ADCSRA &= ~(1<<ADEN);                         // ADC disable 
+//  UCSR0B &= ~(1<<TXCIE0);                       // TX Complete Interrupt
                                                 // disable
   UCSR0B &= ~(1<<UDRIE0);                       // Data Reg. Empty Interrupt 
                                                 // disable
+	ADCSRA &= ~(1<<ADEN);
 }
 
 void chargHandler() {
-  PORTB |= (1<<GREEN);
-  ADCSRA |= (1<<ADEN);                          // Turn the ADC on  
-  UCSR0B |= (1<<TXCIE0);                        // TX Complete Interrupt enable 
-  UCSR0B |= (1<<UDRIE0);                        // Data Reg. Empty Interrupt 
-                                                // disable
+//  PORTB |= (1<<GREEN);
+//  UCSR0B |= (1<<TXCIE0);                        // TX Complete Interrupt enable 
+//  UCSR0B |= (1<<UDRIE0);                        // Data Reg. Empty Interrupt 
+//                                                // enable
+  ADCSRA |= (1<<ADEN);                          // ADC Enable
+	ADCSRA |= (1<<ADSC);													// ADC Start Conversion
 }
 
 void capHandler() {

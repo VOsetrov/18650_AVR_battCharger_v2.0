@@ -1,7 +1,6 @@
 #include "battery.h"
 
 void init_battData(batlist* batt) {
-  batt->plist = &batt->list[0];
   batt->list[0] = (battery) {
     .id = BATT1,
     .voltage      = 0,
@@ -14,9 +13,12 @@ void init_battData(batlist* batt) {
     .capacitance  = 0,
     .resistance   = 0,
   };
+  batt->plist = &batt->list[0];
 }
 
-battID returnBattID(adcchan channel) {
+battID returnBattID
+	(enum adc_chan channel) {
+
   battID id = 0;
   switch(channel) {
     case ADC0:
