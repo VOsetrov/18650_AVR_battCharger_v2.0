@@ -2,7 +2,7 @@ TARGET = chargerHandler
 SRC = main
 CC = avr-gcc
 CPU_Freq = F_CPU=16000000
-CFLAG_1 = -Wall -Og -mmcu=atmega328p 
+CFLAG_1 = -Wall -Og -mmcu=atmega328p -Wl,--print-memory > progmem.txt
 CFLAG_2 = -std=gnu99
 CFLAGS = $(CFLAG_1) $(CFLAG_2)
 CURR_DIR = $(shell pwd)
@@ -13,6 +13,8 @@ PREF_OBJ = $(CURR_DIR)/obj/
 SRC = $(wildcard $(PREF_SRC)*.c)
 OBJ = $(patsubst $(PREF_SRC)%.c, $(PREF_OBJ)%.o, $(SRC))
  
+all: $(TARGET).hex
+
 $(TARGET).hex: $(TARGET)
 	avr-objcopy -O ihex -R .eeprom $< $@
 
@@ -26,5 +28,5 @@ deploy:	$(TARGET).hex
 	avrdude -F -V -c avrdude -p atmega328p -P $(USB_PORT) -b 9500 -U flash:w:$@	
 
 clean:
-	rm $(TARGET) $(PREF_OBJ)*.o *.hex
+	rm $(TARGET) $(PREF_OBJ)*.o *.hex progmem.txt
 
